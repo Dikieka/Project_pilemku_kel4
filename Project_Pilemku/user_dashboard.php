@@ -1,9 +1,8 @@
-<?php 
-require  'navbar.php';
-require_once  'classes/Database.php';
-require_once  'classes/User.php';
+<?php
+require 'navbar.php';
+require_once 'classes/Database.php';
+require_once 'classes/User.php';
 
-session_start();
 use Classes\Database;
 use Classes\User;
 
@@ -22,12 +21,11 @@ if ($currentUser['role'] !== 'user') {
     header('Location: admin_dashboard.php');
     exit;
 }
-
-// Konten halaman user
-echo "<h1>Welcome, User {$currentUser['username']}</h1>";
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +36,9 @@ echo "<h1>Welcome, User {$currentUser['username']}</h1>";
         }
     </style>
 </head>
+
 <body>
-    <h1>USER</h1>
+    <h1>Welcome, <?php echo "{$currentUser['username']}"; ?></h1>
 </body>
+
 </html>

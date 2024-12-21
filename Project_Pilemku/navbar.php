@@ -3,6 +3,7 @@ require_once 'classes/Database.php';
 require_once 'classes/User.php';
 
 session_start();
+
 use Classes\Database;
 use Classes\User;
 
@@ -12,10 +13,16 @@ $user = new User($db->pdo);
 // Mengecek apakah pengguna sudah login
 $isLoggedIn = isset($_SESSION['user_id']);
 $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
+
+$homeLink = 'index.php';
+if ($isLoggedIn) {
+    $homeLink = ($currentUser['role'] === 'admin') ? 'admin_dashboard.php' : 'user_dashboard.php';
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +32,7 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
             margin: 0 auto;
             font-family: 'Segoe UI';
         }
-        
+
         nav {
             display: flex;
             justify-content: space-between;
@@ -93,19 +100,22 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
             border-radius: 10px;
             background-color: #F11376;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.4s ease;
         }
 
         .btn-nav {
             padding: 5px;
         }
+
         .btn-logout a {
-            background-color: #F52955; /* Warna latar belakang tombol logout */
-            transition: background-color 0.3s ease;
+            background-color: #F52955;
+            /* Warna latar belakang tombol logout */
+            transition: background-color 0.4s ease;
         }
 
         .btn-logout a:hover {
-            background-color: #9C0046; /* Warna latar saat di-hover */
+            background-color: #9C0046;
+            /* Warna latar saat di-hover */
         }
 
         .btn-nav:hover {
@@ -133,12 +143,17 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
             padding: 10px;
             z-index: 1;
             border-radius: 5px;
-            display: none; /* Menggunakan Grid Layout */
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Kolom dinamis */
-            max-height: 300px; /* Maksimal tinggi dropdown */
-            overflow-y: auto; /* Scroll jika item terlalu banyak */
+            display: none;
+            /* Menggunakan Grid Layout */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            /* Kolom dinamis */
+            max-height: 300px;
+            /* Maksimal tinggi dropdown */
+            overflow-y: auto;
+            /* Scroll jika item terlalu banyak */
             gap: 10px;
-            width: 400px; /* Lebar dropdown */
+            width: 400px;
+            /* Lebar dropdown */
         }
 
         .dropdown-content a {
@@ -166,14 +181,17 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
 
         .profile-dropdown {
             position: absolute;
-            right: 0; /* Muncul dari sisi kanan */
+            right: 0;
+            /* Muncul dari sisi kanan */
             background-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             padding: 10px;
             z-index: 1;
             border-radius: 5px;
-            display: none; /* Sembunyikan secara default */
-            width: 200px; /* Atur lebar dropdown */
+            display: none;
+            /* Sembunyikan secara default */
+            width: 200px;
+            /* Atur lebar dropdown */
         }
 
         .profile-dropdown a {
@@ -185,22 +203,24 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
             text-decoration: none;
             text-align: center;
         }
-
     </style>
 </head>
+
 <body>
     <nav>
         <ul class="nav-logo">
-        <li><img class="logo" src="uploads/fotoProfile/Logo_Pilemku.png" alt=""></li>
-        <li><h2>Pilemku</h2></li>
+            <li><img class="logo" src="uploads/fotoProfile/Logo_Pilemku.png" alt=""></li>
+            <li>
+                <h2>Pilemku</h2>
+            </li>
             <ul class="nav-search">
                 <li>
                     <input class="search-bar" type="text" placeholder="Search...">
-                </li> 
+                </li>
             </ul>
         </ul>
         <ul>
-        <li class="btn-nav"><a href="index.php">Home</a></li>
+            <li class="btn-nav"><a href="<?= $homeLink ?>">Home</a></li>
             <div class="dropdown">
                 <li class="btn-nav"><a href="#" id="genre-menu">Genre</a></li>
                 <div class="dropdown-content" id="genre-dropdown">
@@ -217,20 +237,25 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
                     <a href="#">Documentary</a>
                 </div>
             </div>
-            <li class="btn-nav"><a href="index.php">MyList</a></li>
+            <?php if ($currentUser && $currentUser['role'] === 'user'): ?>
+                <li class="btn-nav"><a href="mylist.php">Mylist</a></li>
+            <?php endif; ?>
+            <?php if ($currentUser && $currentUser['role'] === 'admin'): ?>
+                <li class="btn-nav"><a href="tambah_admin.php">Tambah Admin</a></li>
+            <?php endif; ?>
             <?php if ($isLoggedIn): ?>
                 <div class="dropdown">
-                    <?php 
-                    $profilePicture = (!empty($currentUser['profile_picture']) && file_exists($currentUser['profile_picture'])) 
-                        ? htmlspecialchars($currentUser['profile_picture']) 
-                        : 'uploads/fotoProfile/default.jpg'; 
+                    <?php
+                    $profilePicture = (!empty($currentUser['profile_picture']) && file_exists($currentUser['profile_picture']))
+                        ? htmlspecialchars($currentUser['profile_picture'])
+                        : 'uploads/fotoProfile/default.jpg';
                     ?>
                     <img src="<?= $profilePicture ?>" alt="Profile" class="profile-picture" id="profile-menu">
                     <div class="profile-dropdown" id="profile-dropdown">
                         <a href="edit_profile.php">
-                            <?= htmlspecialchars($currentUser['username']);?>
+                            <?= htmlspecialchars($currentUser['username']); ?>
                             <br>
-                            <?= htmlspecialchars($currentUser['email']);?>
+                            <?= htmlspecialchars($currentUser['email']); ?>
                         </a>
                         <span class="btn-logout"><a href="logout.php">Logout</a></span>
                     </div>
@@ -249,7 +274,7 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
 
             genreMenu.addEventListener('click', (event) => {
                 event.preventDefault();
-                genreDropdown.style.display = 
+                genreDropdown.style.display =
                     genreDropdown.style.display === 'grid' ? 'none' : 'grid';
             });
 
@@ -266,7 +291,7 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
 
             profileMenu.addEventListener('click', (event) => {
                 event.preventDefault();
-                profileDropdown.style.display = 
+                profileDropdown.style.display =
                     profileDropdown.style.display === 'block' ? 'none' : 'block';
             });
 
@@ -279,4 +304,5 @@ $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
         });
     </script>
 </body>
+
 </html>

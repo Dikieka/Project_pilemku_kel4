@@ -10,7 +10,7 @@ class User {
         $this->pdo = $pdo;
     }
 
-    public function register($username, $password, $email, $role = 'user') {
+    public function register($username, $password, $email, $role) {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $stmt = $this->pdo->prepare("INSERT INTO users (username, password, email, role) VALUES (:username, :password, :email, :role)");
         $stmt->execute([

@@ -12,7 +12,7 @@ if (isset($_POST['register'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $email = $_POST['email'];
-    $role = $_POST['role']; // 'admin' atau 'user'
+    $role = "user"; // 'user'
 
     try {
         $user->register($username, $password, $email, $role);
@@ -24,6 +24,7 @@ if (isset($_POST['register'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,7 +101,8 @@ if (isset($_POST['register'])) {
             color: white;
             font-weight: bold;
             font-size: 14pt;
-            flex: 1; /* Membuat tombol sama lebar */
+            flex: 1;
+            /* Membuat tombol sama lebar */
             transition: background-color 0.3s ease;
         }
 
@@ -115,9 +117,12 @@ if (isset($_POST['register'])) {
 
         .button-container {
             display: flex;
-            justify-content: space-between; /* Mengatur jarak antara tombol */
-            gap: 10px; /* Menambahkan jarak antar tombol */
-            margin-top: 20px; /* Menambahkan jarak dari elemen sebelumnya */
+            justify-content: space-between;
+            /* Mengatur jarak antara tombol */
+            gap: 10px;
+            /* Menambahkan jarak antar tombol */
+            margin-top: 20px;
+            /* Menambahkan jarak dari elemen sebelumnya */
         }
 
         button:hover {
@@ -136,30 +141,26 @@ if (isset($_POST['register'])) {
         }
     </style>
 </head>
+
 <body>
-<img class="logo" src="uploads/fotoProfile/Logo_Pilemku1.png" alt="">
-<form method="POST">
-    <h1>REGISTER</h1>
-     <!-- Tampilkan pesan di sini -->
+    <img class="logo" src="uploads/fotoProfile/Logo_Pilemku1.png" alt="">
+    <form method="POST">
+        <h1>REGISTER</h1>
+        <!-- Tampilkan pesan di sini -->
         <?php if (!empty($statusMessage)): ?>
             <div id="status-message"><?= $statusMessage; ?></div>
         <?php endif; ?>
-    <input type="text" name="username" placeholder="Username" required>
-    <br>
-    <input type="password" name="password" placeholder="Password" required>
-    <br>
-    <input type="email" name="email" placeholder="Email" required>
-    <br>
-    <select name="role">
-        <option value="">role</option>
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-    </select>
-    <br>
-    <div class="button-container">
-    <a href="login.php"><button type="button">Login</button></a>
-    <button class="btn-register" type="submit" name="register">Register</button>
-</div>
+        <input type="text" name="username" placeholder="Username" required>
+        <br>
+        <input type="password" name="password" placeholder="Password" required>
+        <br>
+        <input type="email" name="email" placeholder="Email" required>
+        <br>
+        <div class="button-container">
+            <a href="login.php"><button type="button">Login</button></a>
+            <button class="btn-register" type="submit" name="register">Register</button>
+        </div>
+    </form>
 </body>
-</html>
 
+</html>
