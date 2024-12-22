@@ -1,8 +1,8 @@
 <?php
 ob_start(); // Start output buffering
-require 'navbar.php';
-require_once 'classes/Database.php';
-require_once 'classes/Movie.php';
+require '../navbar.php';
+require_once '../classes/Database.php';
+require_once '../classes/Movie.php';
 
 use Classes\Database;
 use Classes\Movie;
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowedfileExtensions = array('jpg', 'gif', 'png');
         if (in_array($fileExtension, $allowedfileExtensions)) {
             // Directory in which the uploaded file will be moved
-            $uploadFileDir = './uploads/posters/';
+            $uploadFileDir = '../uploads/posters/';
             $dest_path = $uploadFileDir . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -63,32 +63,44 @@ ob_end_flush(); // Flush the output buffer
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
+    <title>Pilemku</title>
+    <style>
+        body {
+            background-color: #262042;
+            color: white;
+        }
+
+        main {
+            padding: 20px 30px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Add Movie</h1>
-    <?php if (isset($errorMessage)): ?>
-        <p style="color: red;"><?= $errorMessage ?></p>
-    <?php endif; ?>
-    <form action="tambah_film.php" method="post" enctype="multipart/form-data">
-        <label for="judul">Judul:</label>
-        <input type="text" id="judul" name="judul" required>
-        <br>
-        <label for="tanggal_rilis">Tanggal Rilis:</label>
-        <input type="date" id="tanggal_rilis" name="tanggal_rilis" required>
-        <br>
-        <label for="sutradara">Sutradara:</label>
-        <input type="text" id="sutradara" name="sutradara" required>
-        <br>
-        <label for="deskripsi">Deskripsi:</label>
-        <textarea id="deskripsi" name="deskripsi" required></textarea>
-        <br>
-        <label for="gambar_poster">Poster Image:</label>
-        <input type="file" name="gambar_poster" id="gambar_poster" required>
-        <br>
-        <button type="submit">Add Movie</button>
-    </form>
+    <main>
+        <h1>Add Movie</h1>
+        <?php if (isset($errorMessage)): ?>
+            <p style="color: red;"><?= $errorMessage ?></p>
+        <?php endif; ?>
+        <form action="tambah_film.php" method="post" enctype="multipart/form-data">
+            <label for="judul">Judul:</label>
+            <input type="text" id="judul" name="judul" required>
+            <br>
+            <label for="tanggal_rilis">Tanggal Rilis:</label>
+            <input type="date" id="tanggal_rilis" name="tanggal_rilis" required>
+            <br>
+            <label for="sutradara">Sutradara:</label>
+            <input type="text" id="sutradara" name="sutradara" required>
+            <br>
+            <label for="deskripsi">Deskripsi:</label>
+            <textarea id="deskripsi" name="deskripsi" required></textarea>
+            <br>
+            <label for="gambar_poster">Poster Image:</label>
+            <input type="file" name="gambar_poster" id="gambar_poster" required>
+            <br>
+            <button type="submit">Add Movie</button>
+        </form>
+    </main>
 </body>
 
 </html>

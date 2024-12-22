@@ -20,9 +20,9 @@ if (isset($_POST['login'])) {
         $_SESSION['username'] = $loggedInUser['username'];
 
         if ($loggedInUser['role'] == 'admin') {
-            header("Location: admin_dashboard.php");
+            header("Location: admin/admin_dashboard.php");
         } else {
-            header("Location: user_dashboard.php");
+            header("Location: user/user_dashboard.php");
         }
     } else {
         $_SESSION['error_message'] = "Username atau password salah!";
@@ -34,7 +34,7 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Pilemku</title>
     <style>
         body {
             font-family: 'Segoe UI';

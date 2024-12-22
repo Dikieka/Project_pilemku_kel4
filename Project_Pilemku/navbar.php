@@ -14,9 +14,9 @@ $user = new User($db->pdo);
 $isLoggedIn = isset($_SESSION['user_id']);
 $currentUser = $isLoggedIn ? $user->getCurrentUser($_SESSION['user_id']) : null;
 
-$homeLink = 'index.php';
+$homeLink = '../profil/index.php';
 if ($isLoggedIn) {
-    $homeLink = ($currentUser['role'] === 'admin') ? 'admin_dashboard.php' : 'user_dashboard.php';
+    $homeLink = ($currentUser['role'] === 'admin') ? '../admin/admin_dashboard.php' : '../user/user_dashboard.php';
 }
 ?>
 
@@ -248,20 +248,20 @@ if ($isLoggedIn) {
                     <?php
                     $profilePicture = (!empty($currentUser['profile_picture']) && file_exists($currentUser['profile_picture']))
                         ? htmlspecialchars($currentUser['profile_picture'])
-                        : 'uploads/fotoProfile/default.jpg';
+                        : '../uploads/fotoProfile/default.jpg';
                     ?>
                     <img src="<?= $profilePicture ?>" alt="Profile" class="profile-picture" id="profile-menu">
                     <div class="profile-dropdown" id="profile-dropdown">
-                        <a href="edit_profile.php">
+                        <a href="../profil/edit_profile.php">
                             <?= htmlspecialchars($currentUser['username']); ?>
                             <br>
                             <?= htmlspecialchars($currentUser['email']); ?>
                         </a>
-                        <span class="btn-logout"><a href="logout.php">Logout</a></span>
+                        <span class="btn-logout"><a href="../logout.php">Logout</a></span>
                     </div>
                 </div>
             <?php else: ?>
-                <li><a href="login.php"><button class="btn-login">Login</button></a></li>
+                <li><a href="../login.php"><button class="btn-login">Login</button></a></li>
             <?php endif; ?>
         </ul>
     </nav>
