@@ -238,7 +238,16 @@ if ($isLoggedIn) {
                 </div>
             </div>
             <?php if ($currentUser && $currentUser['role'] === 'user'): ?>
-                <li class="btn-nav"><a href="mylist.php">Mylist</a></li>
+                <div class="dropdown">
+                    <li class="btn-nav"><a href="#" id="mylist-menu">Mylist</a></li>
+                    <div class="dropdown-content" id="mylist-dropdown">
+                        <a href="mylist.php?tipe=watching">watching</a>
+                        <a href="mylist.php?tipe=completed">completed</a>
+                        <a href="mylist.php?tipe=on-hold">on-hold</a>
+                        <a href="mylist.php?tipe=dropped">dropped</a>
+                        <a href="mylist.php?tipe=plan-to-watch">plan-to-watch</a>
+                    </div>
+                </div>
             <?php endif; ?>
             <?php if ($currentUser && $currentUser['role'] === 'admin'): ?>
                 <li class="btn-nav"><a href="tambah_admin.php">Tambah Admin</a></li>
@@ -282,6 +291,23 @@ if ($isLoggedIn) {
                 if (!genreMenu.contains(event.target) &&
                     !genreDropdown.contains(event.target)) {
                     genreDropdown.style.display = 'none';
+                }
+            });
+
+            // Mylist Dropdown
+            const mylistMenu = document.getElementById('mylist-menu');
+            const mylistDropdown = document.getElementById('mylist-dropdown');
+
+            mylistMenu.addEventListener('click', (event) => {
+                event.preventDefault();
+                mylistDropdown.style.display =
+                    mylistDropdown.style.display === 'grid' ? 'none' : 'grid';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!mylistMenu.contains(event.target) &&
+                    !mylistDropdown.contains(event.target)) {
+                    mylistDropdown.style.display = 'none';
                 }
             });
 

@@ -52,20 +52,37 @@ class Movie
         ]);
     }
 
-    public function deleteMovie($id)
+    public function deleteMovieAndWatchlist($id)
     {
-        // Retrieve the file path of the image
-        $stmt = $this->pdo->prepare("SELECT gambar_poster FROM movies WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $movie = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Start a transaction
+        $this->pdo->beginTransaction();
 
-        if ($movie && file_exists($movie['gambar_poster'])) {
-            // Delete the image file
-            unlink($movie['gambar_poster']);
+        try {
+            // Delete watchlist entries associated with the movie
+            $stmt = $this->pdo->prepare("DELETE FROM watchlist WHERE movie_id = :movie_id");
+            $stmt->execute([':movie_id' => $id]);
+
+            // Retrieve the file path of the image
+            $stmt = $this->pdo->prepare("SELECT gambar_poster FROM movies WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            $movie = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($movie && file_exists($movie['gambar_poster'])) {
+                // Delete the image file
+                unlink($movie['gambar_poster']);
+            }
+
+            // Delete the movie record from the database
+            $stmt = $this->pdo->prepare("DELETE FROM movies WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+
+            // Commit the transaction
+            $this->pdo->commit();
+        } catch (\Exception $e) {
+            // Rollback the transaction if something failed
+            $this->pdo->rollBack();
+            throw $e;
         }
-
-        // Delete the movie record from the database
-        $stmt = $this->pdo->prepare("DELETE FROM movies WHERE id = :id");
-        $stmt->execute([':id' => $id]);
     }
 }
+

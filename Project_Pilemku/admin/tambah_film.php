@@ -10,6 +10,12 @@ use Classes\Movie;
 $db = new Database();
 $movie = new Movie($db->pdo);
 
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../profil/index.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $judul = $_POST['judul'];
     $tanggal_rilis = $_POST['tanggal_rilis'];

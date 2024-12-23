@@ -11,7 +11,7 @@ use Classes\User;
 
 // Cek apakah pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../login.php');
+    header('Location: ../profil/index.php');
     exit;
 }
 

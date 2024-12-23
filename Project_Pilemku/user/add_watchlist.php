@@ -13,6 +13,12 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../profil/index.php');
+    exit;
+}
+
 $db = new Database();
 $movie = new Movie($db->pdo);
 $watchlist = new Watchlist($db->pdo);
@@ -43,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tipe_watchlist'])) {
         main {
             padding: 20px 30px;
         }
+        a{
+            color: white;
+        }
     </style>
 </head>
 
@@ -61,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tipe_watchlist'])) {
                 <option value="plan-to-watch">Plan to Watch</option>
             </select><br>
             <button type="submit">Add to Watchlist</button>
+            <div class="links">
+                <a href="detail_film.php?id=<?= $movieData['id'] ?>">Kembali</a>
+            </div>
         </form>
     </main>
 </body>

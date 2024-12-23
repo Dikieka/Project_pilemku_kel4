@@ -10,8 +10,9 @@ use Classes\Movie;
 $db = new Database();
 $movie = new Movie($db->pdo);
 
-if (!isset($_GET['id'])) {
-    header('Location: admin_dashboard.php');
+// Cek apakah pengguna sudah login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../profil/index.php');
     exit;
 }
 

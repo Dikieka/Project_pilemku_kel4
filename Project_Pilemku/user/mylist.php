@@ -3,11 +3,15 @@ ob_start(); // Start output buffering
 require '../navbar.php';
 require_once '../classes/Database.php';
 require_once '../classes/User.php';
-require_once '../classes/Movie.php';
+require_once '../classes/Watchlist.php';
 
 use Classes\Database;
-use Classes\Movie;
 use Classes\User;
+use Classes\Watchlist;
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Cek apakah pengguna sudah login
 if (!isset($_SESSION['user_id'])) {
@@ -20,24 +24,24 @@ $db = new Database();
 $user = new User($db->pdo);
 $currentUser = $user->getCurrentUser($_SESSION['user_id']);
 
-$movie = new Movie($db->pdo);
-$movies = $movie->getAllMovies();
+$watchlist = new Watchlist($db->pdo);
 
-// Pastikan hanya admin yang dapat mengakses halaman ini
-if ($currentUser['role'] !== 'admin') {
-    header('Location: user_dashboard.php');
-    exit;
-}
+// Get watchlist type from query parameter
+$tipe = isset($_GET['tipe']) ? $_GET['tipe'] : 'watching';
 
-ob_end_flush(); // Flush the output buffer
+// Get watchlist data for the logged-in user
+$userWatchlist = $watchlist->getUserWatchlist($_SESSION['user_id']);
+
+ob_end_flush();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilemku</title>
+    <title>My Watchlist - <?= ucfirst($tipe) ?></title>
     <style>
         body {
             background-color: #262042;
@@ -76,6 +80,7 @@ ob_end_flush(); // Flush the output buffer
             padding: 30px 0;
             display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
             gap: 20px 30px;
         }
 
@@ -104,9 +109,9 @@ ob_end_flush(); // Flush the output buffer
 
 <body>
     <main>
-        <a href="tambah_film.php">Tambah Film</a>
+        <h1>My Watchlist - <?= ucfirst($tipe) ?></h1>
         <div class="container">
-            <?php foreach ($movies as $movie): ?>
+            <?php foreach ($userWatchlist[$tipe] as $movie): ?>
                 <div class="card">
                     <h1><?= htmlspecialchars($movie['judul']) ?></h1>
                     <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>">
@@ -117,6 +122,14 @@ ob_end_flush(); // Flush the output buffer
             <?php endforeach; ?>
         </div>
     </main>
+
+    <script>
+        function confirmDelete(movieId) {
+            if (confirm('Are you sure you want to remove this movie from your watchlist?')) {
+                document.getElementById('delete-form-' + movieId).submit();
+            }
+        }
+    </script>
 </body>
 
 </html>

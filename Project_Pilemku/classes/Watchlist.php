@@ -11,24 +11,24 @@ class Watchlist
         $this->pdo = $pdo;
     }
 
-    public function addToWatchlist($userId, $movieId, $watchlistType)
+    public function addToWatchlist($userId, $movieId, $tipeWatchlist)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO watchlist (user_id, movie_id, watchlist_type, tanggal_ditambahkan) VALUES (:user_id, :movie_id, :watchlist_type, CURRENT_TIMESTAMP)");
-        $stmt->execute(['user_id' => $userId, 'movie_id' => $movieId, 'watchlist_type' => $watchlistType]);
+        $stmt = $this->pdo->prepare("INSERT INTO watchlist (user_id, movie_id, tipe_watchlist) VALUES (:user_id, :movie_id, :tipe_watchlist)");
+        $stmt->execute(['user_id' => $userId, 'movie_id' => $movieId, 'tipe_watchlist' => $tipeWatchlist]);
     }
 
     public function getUserWatchlist($userId)
     {
-        $stmt = $this->pdo->prepare("SELECT w.id, w.watchlist_type, w.tanggal_ditambahkan, m.judul FROM watchlist w JOIN movies m ON w.movie_id = m.id WHERE w.user_id = :user_id");
+        $stmt = $this->pdo->prepare("SELECT w.id, w.tipe_watchlist, m.judul, m.gambar_poster FROM watchlist w JOIN movies m ON w.movie_id = m.id WHERE w.user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $watchlist = ['watching' => [], 'completed' => [], 'on-hold' => [], 'dropped' => [], 'plan-to-watch' => []];
         foreach ($result as $row) {
-            $watchlist[$row['watchlist_type']][] = [
+            $watchlist[$row['tipe_watchlist']][] = [
                 'id' => $row['id'],
                 'judul' => $row['judul'],
-                'tanggal_ditambahkan' => $row['tanggal_ditambahkan']
+                'gambar_poster' => $row['gambar_poster']
             ];
         }
         return $watchlist;
@@ -36,14 +36,14 @@ class Watchlist
 
     public function isMovieInWatchlist($userId, $movieId)
     {
-        $stmt = $this->pdo->prepare("SELECT id FROM watchlist WHERE user_id = :user_id AND movie_id = :movie_id");
+        $stmt = $this->pdo->prepare("SELECT id, tipe_watchlist FROM watchlist WHERE user_id = :user_id AND movie_id = :movie_id");
         $stmt->execute(['user_id' => $userId, 'movie_id' => $movieId]);
-        return $stmt->fetch() !== false;
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function updateWatchlistType($userId, $watchlistId, $newType)
     {
-        $stmt = $this->pdo->prepare("UPDATE watchlist SET watchlist_type = :new_type WHERE id = :id AND user_id = :user_id");
+        $stmt = $this->pdo->prepare("UPDATE watchlist SET tipe_watchlist = :new_type WHERE id = :id AND user_id = :user_id");
         $stmt->execute(['new_type' => $newType, 'id' => $watchlistId, 'user_id' => $userId]);
     }
 
@@ -59,3 +59,4 @@ class Watchlist
         $stmt->execute(['movie_id' => $movieId]);
     }
 }
+
