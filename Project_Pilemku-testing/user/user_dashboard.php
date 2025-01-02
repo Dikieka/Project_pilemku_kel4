@@ -1,43 +1,49 @@
 <?php
-ob_start(); // Start output buffering
+ob_start();
+// Start output buffering 
 require '../navbar.php';
 require_once '../classes/Database.php';
 require_once '../classes/User.php';
 require_once '../classes/Movie.php';
+require_once '../classes/Watchlist.php';
 
 use Classes\Database;
 use Classes\Movie;
 use Classes\User;
+use Classes\Watchlist;
 
-// Cek apakah pengguna sudah login
+// Cek apakah pengguna sudah login 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../profil/index.php');
     exit;
 }
 
 $db = new Database();
+
 $user = new User($db->pdo);
 $currentUser = $user->getCurrentUser($_SESSION['user_id']);
+
 $movie = new Movie($db->pdo);
 $movies = $movie->getAllMovies();
 
+$watchlist = new Watchlist($db->pdo);
+
 $homeLink = '../profil/index.php';
-if ($isLoggedIn) {
+if ($currentUser) {
     $homeLink = ($currentUser['role'] === 'admin') ? '../admin/admin_dashboard.php' : '../user/user_dashboard.php';
 }
 
-// Pastikan hanya user yang dapat mengakses halaman ini
+// Pastikan hanya user yang dapat mengakses halaman ini 
 if ($currentUser['role'] !== 'user') {
     header('Location: admin/admin_dashboard.php');
     exit;
 }
 
-// Mengelompokkan film berdasarkan genre
-$genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Sci-Fi', 'Fantasi', 'Romance', 'Horror', 'Adventure', 'Animation','Documentary', 'Zombie'];
+// Mengelompokkan film berdasarkan genre 
+$genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Sci-Fi', 'Fantasi', 'Romance', 'Horror', 'Adventure', 'Animation', 'Documentary', 'Zombie'];
 $moviesByGenre = [];
-
 foreach ($movies as $movie) {
-    // Membagi genre berdasarkan koma
+    // Membagi genre berdasarkan koma 
     $movieGenres = explode(', ', $movie['genre']);
     foreach ($movieGenres as $genre) {
         if (!isset($moviesByGenre[$genre])) {
@@ -46,8 +52,7 @@ foreach ($movies as $movie) {
         $moviesByGenre[$genre][] = $movie;
     }
 }
-
-ob_end_flush(); // Flush the output buffer
+ob_end_flush(); // Flush the output buffer 
 ?>
 
 <!DOCTYPE html>
@@ -59,8 +64,8 @@ ob_end_flush(); // Flush the output buffer
     <title>Pilemku</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-         /* Global styles */
-         * {
+        /* Global styles */
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -69,7 +74,7 @@ ob_end_flush(); // Flush the output buffer
         html {
             scroll-behavior: smooth;
         }
-        
+
         body {
             background-color: #262042;
             color: white;
@@ -79,7 +84,7 @@ ob_end_flush(); // Flush the output buffer
         main {
             padding: 30px;
         }
-        
+
         /* Hero Section */
         .hero-section {
             padding-left: 10px;
@@ -87,31 +92,31 @@ ob_end_flush(); // Flush the output buffer
             display: flex;
             gap: 30px;
         }
-        
+
         .hero-slider {
             width: 70%;
             overflow: hidden;
             position: relative;
         }
-        
+
         .slider-container {
             display: flex;
             animation: slide 20s infinite;
         }
-        
+
         .slider-item {
             width: 100%;
             flex-shrink: 0;
             position: relative;
         }
-        
+
         .slider-item img {
             width: 100%;
             height: 550px;
             object-fit: cover;
             border-radius: 8px;
         }
-        
+
         .slider-item p {
             position: absolute;
             bottom: 20px;
@@ -122,15 +127,19 @@ ob_end_flush(); // Flush the output buffer
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
             color: white;
         }
-        
+
         /* Side films */
         .side-films {
-            width: 40%; /* Lebar 40% dari area hero-section */
+            width: 40%;
+            /* Lebar 40% dari area hero-section */
             display: flex;
-            flex-wrap: wrap; /* Membungkus item ke baris baru */
+            flex-wrap: wrap;
+            /* Membungkus item ke baris baru */
             gap: 20px;
-            max-height: 580px; /* Batasi tinggi untuk 2 baris */
-            overflow-y: auto; /* Agar bisa scroll jika ada lebih dari 2 baris */
+            max-height: 580px;
+            /* Batasi tinggi untuk 2 baris */
+            overflow-y: auto;
+            /* Agar bisa scroll jika ada lebih dari 2 baris */
         }
 
         /* Film item (thumbnail) */
@@ -138,9 +147,12 @@ ob_end_flush(); // Flush the output buffer
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 30%; /* Membatasi lebar film item menjadi 30% */
-            min-width: 120px; /* Mengatur lebar minimum */
-            margin-bottom: 20px; /* Memberikan jarak antara baris */
+            width: 30%;
+            /* Membatasi lebar film item menjadi 30% */
+            min-width: 120px;
+            /* Mengatur lebar minimum */
+            margin-bottom: 20px;
+            /* Memberikan jarak antara baris */
         }
 
         .film-item img {
@@ -157,7 +169,7 @@ ob_end_flush(); // Flush the output buffer
             color: white;
         }
 
-        
+
         /* Genre Section */
         .container {
             display: flex;
@@ -178,7 +190,7 @@ ob_end_flush(); // Flush the output buffer
             border-radius: 10px;
             padding: 30px 10px 30px 10px;
         }
-        
+
         .container .card {
             width: 190px;
             height: 350px;
@@ -189,13 +201,13 @@ ob_end_flush(); // Flush the output buffer
             flex-direction: column;
             align-items: center;
         }
-        
+
         .container .card img {
             height: 250px;
             width: 190px;
             margin-bottom: 5px;
         }
-        
+
         .container h1 {
             font-weight: bolder;
             font-size: 30pt;
@@ -249,24 +261,24 @@ ob_end_flush(); // Flush the output buffer
             padding: 20px 0;
             text-align: center;
             color: white;
-            
+
         }
 
         .footer-container {
-           width: 100%;
-           margin: auto;
-           padding-left: 30px;
-           padding-right: 30px;
-           display: flex;
-           flex-wrap: wrap;
-           justify-content: space-between;
-           align-items: center;
-           gap: 20px;
+            width: 100%;
+            margin: auto;
+            padding-left: 30px;
+            padding-right: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
         }
 
         .footer-logo {
-           flex: 1;
-           text-align: left;
+            flex: 1;
+            text-align: left;
         }
 
         .footer-logo img {
@@ -274,166 +286,108 @@ ob_end_flush(); // Flush the output buffer
         }
 
         .footer-logo h2 {
-           margin: 0;
-           font-size: 24px;
-           color: #B14BDF;
+            margin: 0;
+            font-size: 24px;
+            color: #B14BDF;
         }
 
         .footer-logo p {
-           font-size: 14px;
-           margin: 5px 0 0;
-           color: #B3B3B3;
+            font-size: 14px;
+            margin: 5px 0 0;
+            color: #B3B3B3;
         }
 
         .footer-links {
-           flex: 2;
-           display: flex;
-           justify-content: center;
-           gap: 30px;
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
         }
 
         .footer-links a {
-           text-decoration: none;
-           color: #FFFFFF;
-           font-size: 16px;
+            text-decoration: none;
+            color: #FFFFFF;
+            font-size: 16px;
         }
 
         .footer-social {
-           flex: 1;
-           text-align: right;
+            flex: 1;
+            text-align: right;
         }
 
         .footer-social a {
-           margin: 0 10px;
-           text-decoration: none;
-           color: #B14BDF;
+            margin: 0 10px;
+            text-decoration: none;
+            color: #B14BDF;
         }
 
         .footer-social img {
-           width: 30px;
-           height: 30px;
+            width: 30px;
+            height: 30px;
         }
 
         .footer-bottom {
-           margin-top: 20px;
-           border-top: 1px solid #333333;
-           padding-top: 10px;
-           font-size: 14px;
-           color: #B3B3B3;
-        }
-        
-        /* Slider Animation */
-        @keyframes slide {
-            0% { transform: translateX(0); }
-            33.33% { transform: translateX(-100%); }
-            66.66% { transform: translateX(-200%); }
-            100% { transform: translateX(0); }
+            margin-top: 20px;
+            border-top: 1px solid #333333;
+            padding-top: 10px;
+            font-size: 14px;
+            color: #B3B3B3;
         }
 
+        /* Slider Animation */
+        @keyframes slide {
+            0% {
+                transform: translateX(0);
+            }
+
+            33.33% {
+                transform: translateX(-100%);
+            }
+
+            66.66% {
+                transform: translateX(-200%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <main>
-        <!-- Hero Section -->
+    <main> <!-- Hero Section -->
         <div class="hero-section">
             <div class="hero-slider">
-                <div class="slider-container">
-                    <?php foreach ($movies as $movie): ?>
-                        <div class="slider-item">
-                            <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="<?= htmlspecialchars($movie['judul']) ?>">
+                <div class="slider-container"> <?php foreach ($movies as $movie): ?> <div class="slider-item"> <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="<?= htmlspecialchars($movie['judul']) ?>">
                             <p><?= htmlspecialchars($movie['judul']) ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                        </div> <?php endforeach; ?> </div>
             </div>
-            <div class="side-films">
-                <?php foreach ($movies as $movie): ?>
-                    <div class="film-item">
-                    <a href="detail_film.php?id=<?= $movie['id'] ?>">
-                        <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="<?= htmlspecialchars($movie['judul']) ?>">
-                        <p><?= htmlspecialchars($movie['judul']) ?></p></a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <!-- Genres Section -->
-        <div class="container">
-            <?php foreach ($genres as $genre): ?>
-                <h1><span class="i">I</span> <?= htmlspecialchars($genre) ?></h1>
-                <div id="<?= $genre ?>" class="container-card">
-                    <?php if (isset($moviesByGenre[$genre])): ?>
-                        <?php foreach ($moviesByGenre[$genre] as $movie): ?>
-                            <div class="card">
-                                <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="Poster">
+            <div class="side-films"> <?php foreach ($movies as $movie): ?> <div class="film-item"> <a href="detail_film.php?id=<?= $movie['id'] ?>"> <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="<?= htmlspecialchars($movie['judul']) ?>">
+                            <p><?= htmlspecialchars($movie['judul']) ?></p>
+                        </a> </div> <?php endforeach; ?> </div>
+        </div> <!-- Genres Section -->
+        <div class="container"> <?php foreach ($genres as $genre): ?> <h1><span class="i">I</span> <?= htmlspecialchars($genre) ?></h1>
+                <div id="<?= $genre ?>" class="container-card"> <?php if (isset($moviesByGenre[$genre])): ?> <?php foreach ($moviesByGenre[$genre] as $movie): ?> <div class="card"> <img src="<?= htmlspecialchars($movie['gambar_poster']) ?>" alt="Poster">
                                 <div class="card-body">
                                     <p><?= htmlspecialchars($movie['judul']) ?></p>
                                 </div>
-                                <div class="btn-card">
-                                    <a class="btn-add" href="../user/add_watchlist.php?id=<?= $movie['id'] ?>">Add to list</a>
-                                    <a class="btn-detail" href="detail_film.php?id=<?= $movie['id'] ?>">Detail</a>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>No movies found in this genre.</p>
-                    <?php endif; ?>
-                </div>
-                <br>
-            <?php endforeach; ?>
+                                <div class="btn-card"> <?php $isInWatchlist = $watchlist->isMovieInWatchlist($_SESSION['user_id'], $movie['id']); ?> <a class="btn-add" href="../user/add_watchlist.php?id=<?= $movie['id'] ?>"><?= $isInWatchlist ? 'Edit Mylist' : 'Add to Mylist' ?></a> <a class="btn-detail" href="detail_film.php?id=<?= $movie['id'] ?>">Detail</a> </div>
+                            </div> <?php endforeach; ?> <?php else: ?> <p>No movies found in this genre.</p> <?php endif; ?> </div> <br> <?php endforeach; ?>
         </div>
-    </main>
-
-    <!-- Footer -->
+    </main> <!-- Footer -->
     <footer>
-        <div class="footer-container">
-            <!-- Logo -->
-            <div class="footer-logo">
-                <img src="../uploads/img/Logo_Pilemku1.png" alt="">
+        <div class="footer-container"> <!-- Logo -->
+            <div class="footer-logo"> <img src="../uploads/img/Logo_Pilemku1.png" alt="">
                 <p>Tempat terbaik untuk mencari referensi film terpopuler</p>
-            </div>
-
-            <!-- Links -->
-            <div class="footer-links">
-                <a href="<?= $homeLink ?>">Home</a>
-                <a href="#Action">Genres</a>
-                <a href="#">Contact</a>
-                <a href="#">About</a>
-            </div>
-
-            <!-- Social Media -->
-            <div class="footer-social">
-                <a href="https://facebook.com" target="#">
-                <img src="../uploads/img/facebook.png" alt="">
-                </a>
-                <a href="https://twitter.com" target="#">
-                <img src="../uploads/img/twitter.png" alt="">
-                </a>
-                <a href="https://instagram.com" target="#">
-                <img src="../uploads/img/instagram.png" alt="">
-                </a>
-            </div>
+            </div> <!-- Links -->
+            <div class="footer-links"> <a href="<?= $homeLink ?>">Home</a> <a href="#Action">Genres</a> <a href="#">Contact</a> <a href="#">About</a> </div> <!-- Social Media -->
+            <div class="footer-social"> <a href="https://facebook.com" target="#"> <img src="../uploads/img/facebook.png" alt=""> </a> <a href="https://twitter.com" target="#"> <img src="../uploads/img/twitter.png" alt=""> </a> <a href="https://instagram.com" target="#"> <img src="../uploads/img/instagram.png" alt=""> </a> </div>
         </div>
-        <div class="footer-bottom">
-            &copy; <?= date('Y') ?> Pilemku. All rights reserved.
-        </div>
+        <div class="footer-bottom"> &copy; <?= date('Y') ?> Pilemku. All rights reserved. </div>
     </footer>
-
     <script src="script.js">
-        // Script to handle the slide effect for the hero slider
-            let index = 0;
-            const slides = document.querySelectorAll('.slider-item');
-
-            function autoSlide() {
-                    index++;
-                    if (index >= slides.length) {
-                    index = 0;
-                }
-                document.querySelector('.slider-container').style.transform = `translateX(-${index * 100}%)`;
-            }
-
-            setInterval(autoSlide, 5000); // Change slide every 5 seconds
+        // Script to handle the slide effect for the hero slider let index = 0; const slides = document.querySelectorAll('.slider-item'); function autoSlide() { index++; if (index >= slides.length) { index = 0; } document.querySelector('.slider-container').style.transform = `translateX(-${index * 100}%)`; } setInterval(autoSlide, 5000); // Change slide every 5 seconds 
     </script>
 </body>
 

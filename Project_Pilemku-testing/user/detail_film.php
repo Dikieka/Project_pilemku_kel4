@@ -207,10 +207,10 @@ ob_end_flush();
 
             <div class="links">
                 <?php if ($isInWatchlist): ?>
-                    <a class="btn-editWatchlist" href="edit_watchlist.php?id=<?= htmlspecialchars($movieData['id']) ?>">Edit Watchlist</a>
-                    <a class="btn-delete" href="#" onclick="confirmDelete()">Remove from Watchlist</a>
+                    <a class="btn-editWatchlist" href="edit_watchlist.php?id=<?= htmlspecialchars($movieData['id']) ?>">Edit Mylist</a>
+                    <a class="btn-delete" href="#" onclick="confirmDelete()">Remove from Mylist</a>
                 <?php else: ?>
-                    <a class="btn-editWatchlist" href="add_watchlist.php?id=<?= htmlspecialchars($movieData['id']) ?>">Add to Watchlist</a>
+                    <a class="btn-editWatchlist" href="add_watchlist.php?id=<?= htmlspecialchars($movieData['id']) ?>">Add to Mylist</a>
                 <?php endif; ?>
                 <a class="btn-kembali" href="<?= $homeLink ?>">Kembali</a>
             </div>
@@ -219,7 +219,7 @@ ob_end_flush();
 
     <script>
         function confirmDelete() {
-            if (confirm('Are you sure you want to remove this movie from your watchlist?')) {
+            if (confirm('Are you sure you want to remove this movie from Mylist?')) {
                 document.getElementById('delete-form').submit();
             }
         }

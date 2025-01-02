@@ -19,14 +19,14 @@ class Watchlist
 
     public function getUserWatchlist($userId)
     {
-        $stmt = $this->pdo->prepare("SELECT w.id, w.tipe_watchlist, m.judul, m.gambar_poster FROM watchlist w JOIN movies m ON w.movie_id = m.id WHERE w.user_id = :user_id");
+        $stmt = $this->pdo->prepare("SELECT w.id, w.movie_id, w.tipe_watchlist, m.judul, m.gambar_poster FROM watchlist w JOIN movies m ON w.movie_id = m.id WHERE w.user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $watchlist = ['watching' => [], 'completed' => [], 'on-hold' => [], 'dropped' => [], 'plan-to-watch' => []];
         foreach ($result as $row) {
             $watchlist[$row['tipe_watchlist']][] = [
-                'id' => $row['id'],
+                'id' => $row['movie_id'],
                 'judul' => $row['judul'],
                 'gambar_poster' => $row['gambar_poster']
             ];
@@ -38,8 +38,10 @@ class Watchlist
     {
         $stmt = $this->pdo->prepare("SELECT id, tipe_watchlist FROM watchlist WHERE user_id = :user_id AND movie_id = :movie_id");
         $stmt->execute(['user_id' => $userId, 'movie_id' => $movieId]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null; // Kembalikan null jika tidak ada data
     }
+
 
     public function updateWatchlistType($userId, $watchlistId, $newType)
     {
